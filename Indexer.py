@@ -134,6 +134,15 @@ def main():
                             "tf_idf": 1
                         }
                     }
+                sorted_tf_idf = {}
+                for doc_id in index[token].keys():
+                    if doc_id == "num_docs":
+                        continue
+                    for doc, idf in sorted(index[token][doc_id].items(), key=lambda x:x[1], reverse=True):
+                        sorted_tf_idf[doc_id] = {"tf_idf": idf}
+                index[token] = {"num_docs": index[token]["num_docs"]}
+                for k in sorted_tf_idf.keys():
+                    index[token][k] = sorted_tf_idf[k]
             if(threshold_count > threshold):
                 store_index(index)
                 index.clear()

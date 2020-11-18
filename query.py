@@ -31,7 +31,7 @@ def merge_lists(list1, list2):
         for docs2 in list2:
             if(docs1.split(':')[0] == docs2.split(':')[0]):
                 return_list.append(docs1)
-
+                return_list.sort(key=lambda x: x.split(':')[1], reverse=True)
     return return_list
     
         
@@ -56,8 +56,8 @@ def search(query):
     while indx<len(tokens):
         current_line = merge_lists(current_line, line_list[indx][1:])
         indx +=1
-    
-    return current_line
+    top_url_list = current_line[:5]
+    return top_url_list
 
 
 def main():
