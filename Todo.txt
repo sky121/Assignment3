@@ -1,0 +1,73 @@
+Milestone 2
+
+At least the following queries should be used to test your retrieval:
+keyword:
+  1 – cristina lopes
+  2 - machine learning
+  3 - ACM
+  4 - master of software engineering
+the top 5 URLs for each of the queries above
+support boolean AND
+
+
+
+
+
+
+
+
+
+
+Milestone 1
+
+Inverted Index:
+  tokens->postings(doc_id, tf-idf(token frequency))
+
+Deliverables: Submit your code and a report (in PDF format) with a table containing some analytics about your index. The minimum analytics are:  
+  -The number of indexed documents;
+  -The number of unique words;
+  -The total size (in KB) of your index on disk.
+
+Index.json:
+{
+  "token1":{
+    "num_docs":0,
+    "doc_id1":{
+      "tf_idf": 0
+    },
+  "token2":{
+    "num_docs":0,
+    "doc_id1":{
+      "tf_idf": 0
+    },
+  },
+}
+
+index.txt
+
+token1:num_docs,doc_id1:tf_idf,doc_id2:tf_idf,doc_id3:tf_idf
+token2:num_docs,doc_id1:tf_idf,doc_id2:tf_idf
+token3:num_docs,doc_id1:tf_idf
+
+
+Note:
+  - Tokens: all alphanumeric sequences in the data
+  - Stop words: do not use stopping while indexing, i.e. use all words, even the frequently occurring ones.
+  - Stemming: use stemming for better textual matches. Suggestion: Porter stemming, but it is up to you to choose.
+  - Important text: text in bold (b, strong), in headings (h1, h2, h3), and in titles should be treated as more important than the in other places.Verify which are the relevant HTML tags to select the important words
+  - Your index should be stored in one or more fles in the program file system (no databases!)
+  - The response to search queries should be 300ms or less  
+  = Your indexer must off load the inverted index hash map from main memory to a partial index on disk at least 3 times during index construction;
+    those partial indexes should be merged in the end.Optionally, after or during merging, they can also be split into separate indexfiles  with  term  ranges.
+    Similarly,  your  search  component  must  not  load  theentire inverted index in main memory.
+
+
+
+Extra Credit
+Extra credit will be given for tasks that improve the retrieval and the user search experience - except for GUI, you must code from scratch. For Example:
+• Detect and eliminate duplicate pages. (1 point for exact, 2 points for near)
+• Add HITS and Page Rank to ranking. (1.5 point HITS, 2.5 for PR)
+• Implement 2-gram and/or 3-gram indexing and use it during retrieval. (1point)
+• Enhance the index with word positions and use that information for retrieval. (2 points)
+• Index anchor words for the target pages (1 point).
+• Implement a Web or GUI interface instead of using the console. (1 pointfor the local GUI, 2 points for a web GUI)
