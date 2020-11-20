@@ -34,8 +34,8 @@ def merge_lists(list1, list2):
         list1_dict[docs1.split(':')[0]] = docs1.split(':')[1]
     for docs2 in list2:
         if(docs2.split(':')[0] in list1_dict):
-            new_str = docs2.split(':')[0] + str(int(list1_dict[docs2.split(':')[0]]) + int(docs2.split(':')[1]))
-            return_list.append(docs2)
+            new_str = docs2.split(':')[0] +":"+ str(int(list1_dict[docs2.split(':')[0]]) + int(docs2.split(':')[1]))
+            return_list.append(new_str)
     return return_list
     
         
