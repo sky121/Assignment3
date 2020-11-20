@@ -6,7 +6,6 @@ import re
 import json
 
 
-
 def get_tokens_in_page(content):
     # gets the list of tokens in the website content
     soup = BeautifulSoup(content, "html.parser")
@@ -104,16 +103,14 @@ def store_index(merge_index):
     with open("cache.txt", "w") as cache:
         cache.write("")
 
-        
+
 def store_docid(docid_to_url):
     with open("docidToUrl.json", 'r') as docidToUrl:
         old_dict = json.load(docidToUrl)
     with open("docidToUrl.json", "w") as docidToUrl:
         old_dict.update(docid_to_url)
         json.dump(old_dict, docidToUrl, indent=4)
-        '''for docid, url in old_dict.items():
-            docid_to_url[docid] = url'''
-            
+
 
 def main():
     docid_to_url = {}
@@ -133,7 +130,9 @@ def main():
             # tokens are the list of words in the website loaded
             tokens = get_tokens_in_page(website["content"])
             website_id += 1  # get_hash(website['url'])
-            docid_to_url[website_id] = website['url']
+            if website_id == 55111:
+                print(website["url"])
+            docid_to_url[website_id] = website["url"]
             for token in tokens:
                 if token in index:  # If the token is already in the index just add 1
                     # if the website is inside the index, we increment the frequency of the token for that website
@@ -157,6 +156,7 @@ def main():
                 docid_to_url = {}
                 threshold_count = 0
 
+    store_docid(docid_to_url)
     store_index(index)
     index.clear()
     index = {}

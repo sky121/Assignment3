@@ -6,6 +6,7 @@ import json
 seek_index = dict()
 docid_to_url = dict()
 
+
 def create_seek_index():
     global seek_index
     curr_offset = 0
@@ -14,7 +15,7 @@ def create_seek_index():
             token = line.split(',')[0].split(':')[0]
             seek_index[token] = curr_offset
             curr_offset += (len(line))
-         
+
 
 def merge_lists(list1, list2):
     '''
@@ -34,13 +35,12 @@ def merge_lists(list1, list2):
         list1_dict[docs1.split(':')[0]] = docs1.split(':')[1]
     for docs2 in list2:
         if(docs2.split(':')[0] in list1_dict):
-            new_str = docs2.split(':')[0] + str(int(list1_dict[docs2.split(':')[0]]) + int(docs2.split(':')[1]))
-            return_list.append(docs2)
+            new_str = docs2.split(
+                ':')[0]+":" + str(int(list1_dict[docs2.split(':')[0]]) + int(docs2.split(':')[1]))
+            return_list.append(new_str)
     return return_list
-    
-        
-             
-             
+
+
 def search(query):
     top_url_list = []
     tokens = query.split(' ')
@@ -55,28 +55,28 @@ def search(query):
     if(len(line_list) == 1):
         current_line = line_list[0][1:]
         current_line.sort(key=lambda x: int(x.split(':')[1]), reverse=True)
-        return current_line
+        return current_line[:5]
 
     indx = 2
     current_line = merge_lists(line_list[0][1:], line_list[1][1:])
-    while indx<len(tokens):
+    while indx < len(tokens):
         current_line = merge_lists(current_line, line_list[indx][1:])
-        indx +=1
+        indx += 1
     current_line.sort(key=lambda x: int(x.split(':')[1]), reverse=True)
-    return current_line
+    return current_line[:5]
 
 
 def main():
     global docid_to_url
-    create_seek_index()  
+    create_seek_index()
     with open("docidToUrl.json", 'r') as docidToUrl:
         docid_to_url = json.load(docidToUrl)
     user_query = input("enter query: ")
     while(user_query != "quit()"):
         top_url_list = search(user_query)
         for docid in top_url_list:
-            print(docid_to_url[docid.split(':')[0]], )docid.split(':')[1]
-        print(top_url_list)
+            print(docid_to_url[docid.split(':')[0]], docid.split(':')[1])
         user_query = input("enter query: ")
 
-main() 
+
+main()
