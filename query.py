@@ -47,6 +47,8 @@ def search(query):
     line_list = []
     with open("Index.txt", "r") as index:
         for token in tokens:
+            if token.lower() not in seek_index:
+                return []
             offset = seek_index[token.lower()]
             index.seek(offset)
             line = index.readline().rstrip().split(",")
@@ -74,10 +76,21 @@ def main():
     user_query = input("enter query: ")
     while(user_query != "quit()"):
         top_url_list = search(user_query)
-        for docid in top_url_list:
-            print(docid)
-            print(docid_to_url[docid.split(':')[0]], docid.split(':')[1])
-        print(top_url_list)
+        #print(top_url_list)
+        i = 0
+        show_more=True
+        while show_more:
+            if(i>=len(top_url_list)):
+                break
+            docid = top_url_list[i]
+            print(docid_to_url[docid.split(':')[0]])
+            i+=1
+            if(i%10==0):
+                show = input("Show More? (yes/no)")
+                if(show=='no'):
+                    show_more=False
+            
+
         user_query = input("enter query: ")
 
 main() 
