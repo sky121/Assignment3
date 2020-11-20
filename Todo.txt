@@ -10,8 +10,10 @@ the top 5 URLs for each of the queries above
 support boolean AND
 
 
-
-
+TODO:
+when we merge the document lists, we have to add tf_idf scores (DONE)
+speed up the merging by putting list1 into a map and just interate through list2 and check the map for each of the values(DONE)
+doc id to url
 
 
 
