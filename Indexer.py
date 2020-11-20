@@ -160,6 +160,8 @@ def main():
     store_index(index)
     index.clear()
     index = {}
+    store_docid(docid_to_url)
+    docid_to_url = {}
 
     with open("Index.txt", "r") as index:
         num_of_line = 0

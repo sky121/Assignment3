@@ -75,7 +75,8 @@ def main():
     while(user_query != "quit()"):
         top_url_list = search(user_query)
         for docid in top_url_list:
-            print(docid_to_url[docid.split(':')[0]], )docid.split(':')[1]
+            print(docid)
+            print(docid_to_url[docid.split(':')[0]], docid.split(':')[1])
         print(top_url_list)
         user_query = input("enter query: ")
 
