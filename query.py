@@ -83,7 +83,9 @@ def main():
             if(i>=len(top_url_list)):
                 break
             docid = top_url_list[i]
+
             print(docid_to_url[docid.split(':')[0]])
+            #print(docid.split(':')[1])
             i+=1
             if(i%10==0):
                 show = input("Show More? (yes/no)")
