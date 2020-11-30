@@ -34,6 +34,7 @@ def create_seek_index():
                 curr_offset += (len(line))
             else:
                 curr_offset += (len(line)) + 1
+    #print("Num Docs:", N_corpus)
 
          
 '''
@@ -60,12 +61,12 @@ def cosine_similarity(query_vector, document_vector): #query vector: {token1:tf_
 def search(query): # we are using lnc.ltc (ddd.qqq)
     tokens = query.split(' ')
     doc_vectors = defaultdict(dict)    # {doc1:{token1:wt1, token2:wt2}, doc2:{token1:wt1, token2:wt2}} used for keeping order for dot prodcut
-    
+ 
     with open("Index.txt", "r") as index:
         df_dict = defaultdict(int) # used for query_vector only to get the df values in computing idf
         for token in set(tokens):
             if token.lower() not in seek_index:
-                return []
+                continue
             offset = seek_index[token.lower()]
             index.seek(offset)
             line = index.readline().rstrip().split(",") # [term:num_doc, doc_id:term_freq, doc_id2:term_freq, ...]
@@ -77,7 +78,7 @@ def search(query): # we are using lnc.ltc (ddd.qqq)
             #get tokens doc freq
             df_dict[token] = line[0].split(':')[1] # "line[0] -> term:num_docs  .split(':')[1] -> num_docs "
             
-            
+    
     with open("doc_vector_length.txt", "r") as doc_db:
         for doc in doc_vectors:
             offset = seek_doc_index[doc]
@@ -88,7 +89,6 @@ def search(query): # we are using lnc.ltc (ddd.qqq)
                 doc_vectors[doc][token] = float(doc_vectors[doc][token])/float(doc_sum_of_sq) # wt1/sumofSquare
 
     query_vector  = vector_query(tokens, df_dict)   #{token1:tf_idf_normalized, token2:tf_idf_normalized}
-    
     return_list = []
     for docs, doc_vector in doc_vectors.items():
         sim = cosine_similarity(query_vector, doc_vector)
@@ -131,7 +131,7 @@ def vector_query(tokens, df_dict):
         idf = math.log10(N_corpus/float(df))  
         token_vector[token] =  token_vector[token]*idf # Calculate the weight vector which is tf * idf 
         sum_of_sq += token_vector[token]**2 #gets the sum of squares for normalization of vector
-        
+   
     for token, tf_idf in token_vector.items(): #calculating the normalized vector for cosine.
         token_vector[token] = tf_idf/math.sqrt(sum_of_sq)
     
