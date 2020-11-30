@@ -1,5 +1,10 @@
 Milestone 3
 
+observations
+1. queries that have more unique words take more time
+2. queries with repeated words do not take anymore time (e.g. cristina lopes vs cristina lopes cristina lopes cristina lopes)
+3. queries with few unique words take less time
+4. common words take longer (e.g. to be vs cristina lopes)
 
 doc_vector_length.txt
 docid1:sqrt_sum_of_square_tf
