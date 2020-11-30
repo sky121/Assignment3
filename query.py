@@ -11,7 +11,7 @@ docid_to_url = dict()
 N_corpus = 0
 
 def create_seek_index():
-    global seek_index, N_corpus
+    global seek_index, N_corpus, seek_doc_index
     curr_offset = 0
     with open("Index.txt", "r") as index:
         for line in index:
@@ -24,13 +24,12 @@ def create_seek_index():
                 curr_offset += (len(line)) + 1
 
     with open("doc_vector_length.txt", "r") as doc_db:
-        global seek_doc_index
         curr_offset = 0
         for line in doc_db:
             N_corpus += 1 # MIGHT NEED TO SUBTRACT 1 FOR EXTRA LINE AT THE END OF DOC VECTOR LENGTH TXT
             doc_entry = line.split(':')
             doc = doc_entry[0]
-            seek_index[doc] = curr_offset
+            seek_doc_index[doc] = curr_offset
             if sys.platform.startswith('darwin'):
                 curr_offset += (len(line))
             else:
@@ -82,11 +81,11 @@ def search(query): # we are using lnc.ltc (ddd.qqq)
     with open("doc_vector_length.txt", "r") as doc_db:
         for doc in doc_vectors:
             offset = seek_doc_index[doc]
-            index.seek(offset)
+            doc_db.seek(offset)
             line = doc_db.readline().rstrip().split(":") # docid:sumofSquare\n -> [docid, sumofSquare]
             doc_sum_of_sq = line[1]
             for token in doc_vectors[doc]: #doc_vectors[doc] = {token1:wt1, token2:wt2} 
-                doc_vectors[doc][token] = float(doc_vectors[doc][token])/doc_sum_of_sq # wt1/sumofSquare
+                doc_vectors[doc][token] = float(doc_vectors[doc][token])/float(doc_sum_of_sq) # wt1/sumofSquare
 
     query_vector  = vector_query(tokens, df_dict)   #{token1:tf_idf_normalized, token2:tf_idf_normalized}
     
