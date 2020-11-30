@@ -1,5 +1,5 @@
 
-
+# RANDOM COMMENT dadsfdsakf;
 import sys
 import math
 import json
@@ -14,7 +14,7 @@ def create_seek_index():
         for line in index:
             token = line.split(',')[0].split(':')[0]
             seek_index[token] = curr_offset
-            curr_offset += (len(line))
+            curr_offset += (len(line)) + 1
 
 
 def merge_lists(list1, list2):
@@ -35,8 +35,8 @@ def merge_lists(list1, list2):
         list1_dict[docs1.split(':')[0]] = docs1.split(':')[1]
     for docs2 in list2:
         if(docs2.split(':')[0] in list1_dict):
-            new_str = docs2.split(
-                ':')[0]+":" + str(int(list1_dict[docs2.split(':')[0]]) + int(docs2.split(':')[1]))
+            new_str = docs2.split(':')[
+                0] + ":" + str(int(list1_dict[docs2.split(':')[0]]) + int(docs2.split(':')[1]))
             return_list.append(new_str)
     return return_list
 
@@ -47,6 +47,8 @@ def search(query):
     line_list = []
     with open("Index.txt", "r") as index:
         for token in tokens:
+            if token.lower() not in seek_index:
+                return []
             offset = seek_index[token.lower()]
             index.seek(offset)
             line = index.readline().rstrip().split(",")
@@ -74,8 +76,20 @@ def main():
     user_query = input("enter query: ")
     while(user_query != "quit()"):
         top_url_list = search(user_query)
-        for docid in top_url_list:
-            print(docid_to_url[docid.split(':')[0]], docid.split(':')[1])
+        # print(top_url_list)
+        i = 0
+        show_more = True
+        while show_more:
+            if(i >= len(top_url_list)):
+                break
+            docid = top_url_list[i]
+            print(docid_to_url[docid.split(':')[0]])
+            i += 1
+            if(i % 10 == 0):
+                show = input("Show More? (yes/no)")
+                if(show == 'no'):
+                    show_more = False
+
         user_query = input("enter query: ")
 
 
