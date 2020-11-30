@@ -1,4 +1,3 @@
-
 # RANDOM COMMENT dadsfdsakf;
 import sys
 import math
@@ -92,7 +91,7 @@ def search(query):  # we are using lnc.ltc (ddd.qqq)
 
     # sorts by similarity by splitting doc_id1:similarity -> similarity
     return_list.sort(key=lambda x: float(x.split(':')[1]), reverse=True)
-    print(return_list)
+    print(return_list[:5])
     return return_list
 
     '''
