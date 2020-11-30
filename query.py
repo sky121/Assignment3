@@ -20,18 +20,12 @@ def create_seek_index():
                 N_corpus = int(token)
                 break
             seek_index[token] = curr_offset
-<<<<<<< HEAD
-            curr_offset += (len(line)) + 1
-
-=======
             if sys.platform.startswith('darwin'):
                 curr_offset += (len(line))
             else:
                 curr_offset += (len(line)) + 1
     print(N_corpus)
 
-         
->>>>>>> 6d0641f741fd4901d88b97e9f0028a0271ffc90a
 
 def merge_lists(list1, list2):
     '''
@@ -55,15 +49,8 @@ def merge_lists(list1, list2):
                 0] + ":" + str(int(list1_dict[docs2.split(':')[0]]) + int(docs2.split(':')[1]))
             return_list.append(new_str)
     return return_list
-<<<<<<< HEAD
 
 
-=======
-    
-    
-             
-             
->>>>>>> 6d0641f741fd4901d88b97e9f0028a0271ffc90a
 def search(query):
     tokens = query.split(' ')
     line_list = []
@@ -89,6 +76,7 @@ def search(query):
     current_line.sort(key=lambda x: int(x.split(':')[1]), reverse=True)
     return current_line[:5]
 
+
 def vector_query(query):
     '''returns the normalized query vector'''
     tokens_count = defaultdict(int)
@@ -100,8 +88,6 @@ def vector_query(query):
         if frequency == 0:
             continue
         tokens_count[token] = 1 + math.log10(frequency)
-
-    
 
 
 def main():
@@ -121,21 +107,12 @@ def main():
             docid = top_url_list[i]
 
             print(docid_to_url[docid.split(':')[0]])
-<<<<<<< HEAD
+            # print(docid.split(':')[1])
             i += 1
             if(i % 10 == 0):
                 show = input("Show More? (yes/no)")
                 if(show == 'no'):
                     show_more = False
-
-=======
-            #print(docid.split(':')[1])
-            i+=1
-            if(i%10==0):
-                show = input("Show More? (yes/no)")
-                if(show=='no'):
-                    show_more=False
->>>>>>> 6d0641f741fd4901d88b97e9f0028a0271ffc90a
         user_query = input("enter query: ")
 
 
