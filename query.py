@@ -3,19 +3,35 @@
 import sys
 import math
 import json
+from collections import defaultdict
 seek_index = dict()
 docid_to_url = dict()
+N_corpus = None
 
 
 def create_seek_index():
-    global seek_index
+    global seek_index, N_corpus
     curr_offset = 0
     with open("Index.txt", "r") as index:
         for line in index:
-            token = line.split(',')[0].split(':')[0]
+            token_entry = line.split(',')[0].split(':')
+            token = token_entry[0]
+            if token_entry[1] == "num_docs":
+                N_corpus = int(token)
+                break
             seek_index[token] = curr_offset
+<<<<<<< HEAD
             curr_offset += (len(line)) + 1
 
+=======
+            if sys.platform.startswith('darwin'):
+                curr_offset += (len(line))
+            else:
+                curr_offset += (len(line)) + 1
+    print(N_corpus)
+
+         
+>>>>>>> 6d0641f741fd4901d88b97e9f0028a0271ffc90a
 
 def merge_lists(list1, list2):
     '''
@@ -39,10 +55,16 @@ def merge_lists(list1, list2):
                 0] + ":" + str(int(list1_dict[docs2.split(':')[0]]) + int(docs2.split(':')[1]))
             return_list.append(new_str)
     return return_list
+<<<<<<< HEAD
 
 
+=======
+    
+    
+             
+             
+>>>>>>> 6d0641f741fd4901d88b97e9f0028a0271ffc90a
 def search(query):
-    top_url_list = []
     tokens = query.split(' ')
     line_list = []
     with open("Index.txt", "r") as index:
@@ -67,6 +89,20 @@ def search(query):
     current_line.sort(key=lambda x: int(x.split(':')[1]), reverse=True)
     return current_line[:5]
 
+def vector_query(query):
+    '''returns the normalized query vector'''
+    tokens_count = defaultdict(int)
+    tokens = query.split()
+    for token in tokens:
+        tokens_count[token] += 1
+    # Calculate weight = 1 + log(tf)
+    for token, frequency in tokens_count.items():
+        if frequency == 0:
+            continue
+        tokens_count[token] = 1 + math.log10(frequency)
+
+    
+
 
 def main():
     global docid_to_url
@@ -83,13 +119,23 @@ def main():
             if(i >= len(top_url_list)):
                 break
             docid = top_url_list[i]
+
             print(docid_to_url[docid.split(':')[0]])
+<<<<<<< HEAD
             i += 1
             if(i % 10 == 0):
                 show = input("Show More? (yes/no)")
                 if(show == 'no'):
                     show_more = False
 
+=======
+            #print(docid.split(':')[1])
+            i+=1
+            if(i%10==0):
+                show = input("Show More? (yes/no)")
+                if(show=='no'):
+                    show_more=False
+>>>>>>> 6d0641f741fd4901d88b97e9f0028a0271ffc90a
         user_query = input("enter query: ")
 
 
