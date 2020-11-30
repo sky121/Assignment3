@@ -1,3 +1,48 @@
+Milestone 3
+
+TO DO FOR US:
+Getting vector of query:
+  1. get the tf raw of the query (count frequency of each term)
+  2. get the tf weight from the first tf (1+log(tf-raw)) 
+  3. df = document frequency for each term
+  4. follow the formula to get the idf = log10(N/df)
+  5. get the weight. Weight = tf * idf
+  6. divide weight to be normalized unit vectors = wt/sqrt(sum of squares of weights)
+
+
+  Getting vector of docs:
+  1. tf raw for doc(number of time that term appears in the doc)
+  2. get the tf weight from the first tf (1+log(tf-raw)) 
+  3. divide weight to be normalized unit vectors = wt/sqrt(sum of squares of weights)
+
+
+  score = product of normalized vector doc with normalized vector query 
+
+  fix the operating system issue
+
+
+
+-Come up with a set of at least 20 queries
+  -in terms of ranking performance (effectiveness) and in terms of runtime performance (efficiency)
+  -At least half of those queries should be chosen because they do poorly on one or both criteria; the other half should do well 
+  -as general as possible.
+
+
+
+Deliverables:
+-Setup README explaining how to use your programs
+-PDF document with your test queries(no need to report the results)
+  -which ones started by doing poorly (i.e. giving you poor results) and explain what you did in your search engine to make them perform better.
+
+Does your search engine work as expected of search engines?
+• How general are the heuristics that you employed to improve the retrieval?
+• Is the search response time under the expected limit?
+• Do you demonstrate in-depth knowledge of how your search engine works? Are you able to answer detailed questions pertaining to any aspect of its implementation?
+
+
+
+
+
 Milestone 2
 
 At least the following queries should be used to test your retrieval:
