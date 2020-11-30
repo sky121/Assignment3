@@ -4,6 +4,7 @@ import sys
 import math
 import json
 from collections import defaultdict
+from datetime import datetime
 seek_index = dict()
 docid_to_url = dict()
 N_corpus = None
@@ -79,7 +80,6 @@ def search(query): # we are using lnc.ltc (ddd.qqq)
         return_list.append(f"{docs}:{sim}")  # [doc_id1:similarity, doc_id2:similarity]
 
     return_list.sort(key=lambda x: float(x.split(':')[1]), reverse=True) #sorts by similarity by splitting doc_id1:similarity -> similarity
-    print(return_list)
     return return_list
 
 
@@ -132,8 +132,10 @@ def main():
     with open("docidToUrl.json", 'r') as docidToUrl:
         docid_to_url = json.load(docidToUrl)
     user_query = input("enter query: ")
+    start = datetime.now()
     while(user_query != "quit()"):
         top_url_list = search(user_query)
+        print(datetime.now() - start)
         #print(top_url_list)
         i = 0
         show_more=True
