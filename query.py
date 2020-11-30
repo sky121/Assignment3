@@ -136,7 +136,6 @@ def main():
     while(user_query != "quit()"):
         top_url_list = search(user_query)
         print(datetime.now() - start)
-        #print(top_url_list)
         i = 0
         show_more=True
         while show_more:
@@ -146,11 +145,12 @@ def main():
 
             print(docid_to_url[docid.split(':')[0]])
             #print(docid.split(':')[1])
-            i+=1
+            i += 1
             if(i%10==0):
-                show = input("Show More? (yes/no)")
+                show = input("Show More? (yes/no) ")
                 if(show=='no'):
                     show_more=False
         user_query = input("enter query: ")
+        start = datetime.now()
 
 main() 
