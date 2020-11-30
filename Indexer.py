@@ -1,9 +1,24 @@
-from hashlib import sha224
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
 from os import walk, rename, path
 import re
+from collections import defaultdict
 import json
+from math import sqrt
+
+
+def store_doc_vector_length(doc_id, tokens):
+    with open("doc_vector_length.txt", 'a') as doc_db: # docid1:sqrt_sum_of_square_tf\n docid2:sqrt_sum_of_square_tf
+        vector_length = 0 
+        tf_dict = defaultdict(int)  # gets the token frequency in tokens
+        for token in tokens:
+            tf_dict[token]+=1
+        for token, tf in tf_dict.items(): # computes the length of our vector by doing the sum of squares of the token counts
+            vector_length += tf**2
+        vector_length = sqrt(vector_length) # Pythagorean Theorem
+        write_string = f"{doc_id}:{vector_length}\n"
+        doc_db.write(write_string)
+        
 
 
 
@@ -22,10 +37,6 @@ def get_tokens_in_page(content):
     return tokens
 
 
-def get_hash(url):
-    return sha224(url.encode("utf-8")).hexdigest()
-
-
 def initialize_database():
     try:
         with open("Index.txt", 'w') as index:
@@ -34,6 +45,8 @@ def initialize_database():
             cache.write("")
         with open("docidToUrl.json", "w") as docidToUrl:
             json.dump({}, docidToUrl, indent=4)
+        with open("doc_vector_length.txt", 'w') as doc_db:
+            doc_db.write("")
     except:
         raise Exception("Initailized database ran into trouble")
 
@@ -133,6 +146,7 @@ def main():
             # tokens are the list of words in the website loaded
             tokens = get_tokens_in_page(website["content"])
             website_id += 1  # get_hash(website['url'])
+            store_doc_vector_length(website_id, tokens) 
             docid_to_url[website_id] = website['url']
             for token in tokens:
                 if token in index:  # If the token is already in the index just add 1
@@ -168,9 +182,6 @@ def main():
         for line in index:
             num_of_line += 1
 
-    with open("Index.txt", "a") as index:
-        write_string = f"{num_docs}:num_docs"
-        index.write(write_string)
 
     print("number of unique tokens in Index: ", num_of_line)
     print("Index file size:", path.getsize("Index.txt"))

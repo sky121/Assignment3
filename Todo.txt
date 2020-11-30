@@ -1,6 +1,11 @@
 Milestone 3
 
 
+doc_vector_length.txt
+docid1:sqrt_sum_of_square_tf
+docid2:sqrt_sum_of_square_tf
+
+
 TO DO:
 - 20 queries
 - README
@@ -25,6 +30,8 @@ Getting vector of query:
   score = product of normalized vector doc with normalized vector query 
 
   fix the operating system issue
+
+  MIGHT NEED TO SUBTRACT 1 FOR EXTRA LINE AT THE END OF DOC VECTOR LENGTH TXT
 
 
 
