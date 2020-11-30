@@ -1,5 +1,11 @@
 Milestone 3
 
+
+TO DO:
+- 20 queries
+- README
+
+- Delay time (0.03 -> 30 ms)
 TO DO FOR US:
 Getting vector of query:
   1. get the tf raw of the query (count frequency of each term)
