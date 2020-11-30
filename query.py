@@ -79,7 +79,7 @@ def search(query): # we are using lnc.ltc (ddd.qqq)
         return_list.append(f"{docs}:{sim}")  # [doc_id1:similarity, doc_id2:similarity]
 
     return_list.sort(key=lambda x: float(x.split(':')[1]), reverse=True) #sorts by similarity by splitting doc_id1:similarity -> similarity
-    print(return_list)
+    print(return_list[:10])
     return return_list
 
 
