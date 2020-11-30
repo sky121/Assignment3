@@ -167,6 +167,11 @@ def main():
         num_of_line = 0
         for line in index:
             num_of_line += 1
+
+    with open("Index.txt", "a") as index:
+        write_string = f"{num_docs}:num_docs"
+        index.write(write_string)
+
     print("number of unique tokens in Index: ", num_of_line)
     print("Index file size:", path.getsize("Index.txt"))
     print("number of documents: ", num_docs)

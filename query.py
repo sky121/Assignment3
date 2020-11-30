@@ -3,17 +3,28 @@
 import sys
 import math
 import json
+from collections import defaultdict
 seek_index = dict()
 docid_to_url = dict()
+N_corpus = None
 
 def create_seek_index():
-    global seek_index
+    global seek_index, N_corpus
     curr_offset = 0
     with open("Index.txt", "r") as index:
         for line in index:
-            token = line.split(',')[0].split(':')[0]
+            token_entry = line.split(',')[0].split(':')
+            token = token_entry[0]
+            if token_entry[1] == "num_docs":
+                N_corpus = int(token)
+                break
             seek_index[token] = curr_offset
-            curr_offset += (len(line))+1
+            if sys.platform.startswith('darwin'):
+                curr_offset += (len(line))
+            else:
+                curr_offset += (len(line)) + 1
+    print(N_corpus)
+
          
 
 def merge_lists(list1, list2):
@@ -38,11 +49,10 @@ def merge_lists(list1, list2):
             return_list.append(new_str)
     return return_list
     
-        
+    
              
              
 def search(query):
-    top_url_list = []
     tokens = query.split(' ')
     line_list = []
     with open("Index.txt", "r") as index:
@@ -66,6 +76,20 @@ def search(query):
         indx +=1
     current_line.sort(key=lambda x: int(x.split(':')[1]), reverse=True)
     return current_line
+
+def vector_query(query):
+    '''returns the normalized query vector'''
+    tokens_count = defaultdict(int)
+    tokens = query.split()
+    for token in tokens:
+        tokens_count[token] += 1
+    # Calculate weight = 1 + log(tf)
+    for token, frequency in tokens_count.items():
+        if frequency == 0:
+            continue
+        tokens_count[token] = 1 + math.log10(frequency)
+
+    
 
 
 def main():
@@ -91,8 +115,6 @@ def main():
                 show = input("Show More? (yes/no)")
                 if(show=='no'):
                     show_more=False
-            
-
         user_query = input("enter query: ")
 
 main() 
