@@ -13,7 +13,7 @@ def create_seek_index():
         for line in index:
             token = line.split(',')[0].split(':')[0]
             seek_index[token] = curr_offset
-            curr_offset += (len(line))
+            curr_offset += (len(line))+1
          
 
 def merge_lists(list1, list2):

@@ -1,3 +1,16 @@
+Milestone 3
+
+
+
+Deliverables:
+-Setup README explaining how to use your programs
+-PDF document with your test queries(no need to report the results)
+  -which ones started by doing poorly (i.e. giving you poor results) and explain what you did in your search engine to make them perform better.
+
+
+
+
+
 Milestone 2
 
 At least the following queries should be used to test your retrieval:
