@@ -150,6 +150,7 @@ def main():
     start = datetime.now()
     while(user_query != "quit()"):
         top_url_list = search(user_query)
+        print(top_url_list[:5])
         print(datetime.now() - start)
         i = 0
         show_more=True
