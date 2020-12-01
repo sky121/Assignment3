@@ -8,17 +8,17 @@ from math import sqrt
 
 
 def store_doc_vector_length(doc_id, tokens):
-    with open("doc_vector_length.txt", 'a') as doc_db: # docid1:sqrt_sum_of_square_tf\n docid2:sqrt_sum_of_square_tf
-        vector_length = 0 
+    # docid1:sqrt_sum_of_square_tf\n docid2:sqrt_sum_of_square_tf
+    with open("doc_vector_length.txt", 'a') as doc_db:
+        vector_length = 0
         tf_dict = defaultdict(int)  # gets the token frequency in tokens
         for token in tokens:
-            tf_dict[token]+=1
-        for token, tf in tf_dict.items(): # computes the length of our vector by doing the sum of squares of the token counts
+            tf_dict[token] += 1
+        for token, tf in tf_dict.items():  # computes the length of our vector by doing the sum of squares of the token counts
             vector_length += tf**2
-        vector_length = sqrt(vector_length) # Pythagorean Theorem
+        vector_length = sqrt(vector_length)  # Pythagorean Theorem
         write_string = f"{doc_id}:{vector_length}\n"
         doc_db.write(write_string)
-        
 
 
 def get_tokens_in_page(content):
@@ -143,14 +143,8 @@ def main():
             # tokens are the list of words in the website loaded
             tokens = get_tokens_in_page(website["content"])
             website_id += 1  # get_hash(website['url'])
-<<<<<<< HEAD
-            if website_id == 55111:
-                print(website["url"])
-            docid_to_url[website_id] = website["url"]
-=======
-            store_doc_vector_length(website_id, tokens) 
+            store_doc_vector_length(website_id, tokens)
             docid_to_url[website_id] = website['url']
->>>>>>> 65e4e74c74cf0d05b88f2b430149e637be85f704
             for token in tokens:
                 if token in index:  # If the token is already in the index just add 1
                     # if the website is inside the index, we increment the frequency of the token for that website
@@ -185,7 +179,6 @@ def main():
         num_of_line = 0
         for line in index:
             num_of_line += 1
-
 
     print("number of unique tokens in Index: ", num_of_line)
     print("Index file size:", path.getsize("Index.txt"))

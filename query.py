@@ -25,6 +25,19 @@ def create_seek_index():
             else:
                 curr_offset += (len(line)) + 1
 
+    with open("doc_vector_length.txt", "r") as doc_db:
+        curr_offset = 0
+        for line in doc_db:
+            N_corpus += 1  # MIGHT NEED TO SUBTRACT 1 FOR EXTRA LINE AT THE END OF DOC VECTOR LENGTH TXT
+            doc_entry = line.split(':')
+            doc = doc_entry[0]
+            seek_doc_index[doc] = curr_offset
+            if sys.platform.startswith('darwin'):
+                curr_offset += (len(line))
+            else:
+                curr_offset += (len(line)) + 1
+    #print("Num Docs:", N_corpus)
+
 
 '''
 def merge_lists(list1, list2):
@@ -54,14 +67,13 @@ def search(query):  # we are using lnc.ltc (ddd.qqq)
     tokens = query.split(' ')
     # {doc1:{token1:wt1, token2:wt2}, doc2:{token1:wt1, token2:wt2}} used for keeping order for dot prodcut
     doc_vectors = defaultdict(dict)
-    # {doc1: sum_of_sqrts1, doc2: sum_of_sqrts2}
-    doc_vectors_sum_of_sqrts = defaultdict(int)
+
     with open("Index.txt", "r") as index:
         # used for query_vector only to get the df values in computing idf
         df_dict = defaultdict(int)
         for token in set(tokens):
             if token.lower() not in seek_index:
-                return []
+                continue
             offset = seek_index[token.lower()]
             index.seek(offset)
             # [term:num_doc, doc_id:term_freq, doc_id2:term_freq, ...]
@@ -71,19 +83,25 @@ def search(query):  # we are using lnc.ltc (ddd.qqq)
                 doc, freq = docFreq.split(':')
                 wt = 1 + math.log10(int(freq))
                 doc_vectors[doc][token] = wt
-                doc_vectors_sum_of_sqrts[doc] += wt**2
+
             # get tokens doc freq
             # "line[0] -> term:num_docs  .split(':')[1] -> num_docs "
             df_dict[token] = line[0].split(':')[1]
 
-    for doc, sum_of_sq in doc_vectors_sum_of_sqrts.items():
-        for token in doc_vectors[doc]:
-            doc_vectors[doc][token] = float(
-                doc_vectors[doc][token])/math.sqrt(sum_of_sq)
+    with open("doc_vector_length.txt", "r") as doc_db:
+        for doc in doc_vectors:
+            offset = seek_doc_index[doc]
+            doc_db.seek(offset)
+            # docid:sumofSquare\n -> [docid, sumofSquare]
+            line = doc_db.readline().rstrip().split(":")
+            doc_sum_of_sq = line[1]
+            # doc_vectors[doc] = {token1:wt1, token2:wt2}
+            for token in doc_vectors[doc]:
+                doc_vectors[doc][token] = float(
+                    doc_vectors[doc][token])/float(doc_sum_of_sq)  # wt1/sumofSquare
 
     # {token1:tf_idf_normalized, token2:tf_idf_normalized}
     query_vector = vector_query(tokens, df_dict)
-
     return_list = []
     for docs, doc_vector in doc_vectors.items():
         sim = cosine_similarity(query_vector, doc_vector)
@@ -147,6 +165,7 @@ def main():
     start = datetime.now()
     while(user_query != "quit()"):
         top_url_list = search(user_query)
+        print(top_url_list[:5])
         print(datetime.now() - start)
         i = 0
         show_more = True

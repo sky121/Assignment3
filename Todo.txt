@@ -1,14 +1,23 @@
 Milestone 3
 
+TO DO:
+- 20 queries
+- README
+- Heuristic: Only consider high idf query terms and docs containing many query terms
+- Improve performance of observations
+
+observations
+1. queries that have more unique words take more time
+2. queries with repeated words do not take anymore time (e.g. cristina lopes vs cristina lopes cristina lopes cristina lopes)
+3. queries with few unique words take less time
+4. common words take longer (e.g. to be vs cristina lopes)
 
 doc_vector_length.txt
 docid1:sqrt_sum_of_square_tf
 docid2:sqrt_sum_of_square_tf
 
 
-TO DO:
-- 20 queries
-- README
+
 
 - Delay time (0.03 -> 30 ms)
 TO DO FOR US:
