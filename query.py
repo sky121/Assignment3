@@ -6,11 +6,12 @@ from collections import defaultdict
 from datetime import datetime
 seek_index = dict()
 docid_to_url = dict()
-N_corpus = None
+seek_doc_index = dict()
+N_corpus = 0
 
 
 def create_seek_index():
-    global seek_index, N_corpus
+    global seek_index, N_corpus, seek_doc_index
     curr_offset = 0
     with open("Index.txt", "r") as index:
         for line in index:
