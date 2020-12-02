@@ -34,6 +34,7 @@ def create_seek_index():
                 curr_offset += (len(line))
             else:
                 curr_offset += (len(line)) + 1
+    #print("Num Docs:", N_corpus)
 
          
 '''
@@ -88,8 +89,8 @@ def search(query, index, doc_db): # we are using lnc.ltc (ddd.qqq)
         for token in doc_vectors[doc]: #doc_vectors[doc] = {token1:wt1, token2:wt2} 
             doc_vectors[doc][token] = float(doc_vectors[doc][token])/float(doc_sum_of_sq) # wt1/sumofSquare
 
+
     query_vector  = vector_query(tokens, df_dict)   #{token1:tf_idf_normalized, token2:tf_idf_normalized}
-    
     return_list = []
     for docs, doc_vector in doc_vectors.items():
         sim = cosine_similarity(query_vector, doc_vector)
@@ -132,7 +133,7 @@ def vector_query(tokens, df_dict):
         idf = math.log10(N_corpus/float(df))  
         token_vector[token] =  token_vector[token]*idf # Calculate the weight vector which is tf * idf 
         sum_of_sq += token_vector[token]**2 #gets the sum of squares for normalization of vector
-        
+   
     for token, tf_idf in token_vector.items(): #calculating the normalized vector for cosine.
         token_vector[token] = tf_idf/math.sqrt(sum_of_sq)
     
@@ -153,6 +154,8 @@ def main():
     start = datetime.now()
     while(user_query != "quit()"):
         top_url_list = search(user_query, index, doc_db)
+
+        print(top_url_list[:5])
         print(datetime.now() - start)
         i = 0
         show_more=True
