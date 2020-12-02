@@ -12,6 +12,17 @@ observations
 3. queries with few unique words take less time
 4. common words take longer (e.g. to be vs cristina lopes)
 
+Imrpovements to be made:
+1. consider only the higher idf score terms when the idf score of the words in the query are quite different
+2. consider only the part of the query terms 
+3. Set a minimum thresold for the idf score as a mean to cut of the useless doc in the posting list
+4. Terminate early by setting K. (combination of previous 4 methods might work pretty well)
+5. Build separate index for fields such as author, title, year. (I have no idea how to do so, bs4 parser?)
+6. build index for zones such as the title, abstract, body paragraphs, references.
+7. If we build different indexes, we can rank the indexes into tiers. We can only use the higher tier indexes such as the author index.
+8. build index with word position. If two words from query appear close in a doc , we give the doc a higher weight. 
+9. Maybe we can add the authority ranking (I dont think its necessary since we only consider ics domain)
+
 doc_vector_length.txt
 docid1:sqrt_sum_of_square_tf
 docid2:sqrt_sum_of_square_tf
