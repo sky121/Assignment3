@@ -57,35 +57,36 @@ def cosine_similarity(query_vector, document_vector): #query vector: {token1:tf_
     return dot_product
                          
              
-def search(query): # we are using lnc.ltc (ddd.qqq)
+
+# open file and pass opened file as argument?
+def search(query, index, doc_db): # we are using lnc.ltc (ddd.qqq)
     tokens = query.split(' ')
     doc_vectors = defaultdict(dict)    # {doc1:{token1:wt1, token2:wt2}, doc2:{token1:wt1, token2:wt2}} used for keeping order for dot prodcut
     
-    with open("Index.txt", "r") as index:
-        df_dict = defaultdict(int) # used for query_vector only to get the df values in computing idf
-        for token in set(tokens):
-            if token.lower() not in seek_index:
-                return []
-            offset = seek_index[token.lower()]
-            index.seek(offset)
-            line = index.readline().rstrip().split(",") # [term:num_doc, doc_id:term_freq, doc_id2:term_freq, ...]
-            for docFreq in line[1:]:
-                doc, freq = docFreq.split(':')  #term:num_doc -> split(':') -> term, num_doc
-                wt = 1 + math.log10(int(freq))
-                doc_vectors[doc][token] = wt
-                
-            #get tokens doc freq
-            df_dict[token] = line[0].split(':')[1] # "line[0] -> term:num_docs  .split(':')[1] -> num_docs "
+    df_dict = defaultdict(int) # used for query_vector only to get the df values in computing idf
+    for token in set(tokens):
+        if token.lower() not in seek_index:
+            return []
+        offset = seek_index[token.lower()]
+        index.seek(offset)
+        line = index.readline().rstrip().split(",") # [term:num_doc, doc_id:term_freq, doc_id2:term_freq, ...]
+        for docFreq in line[1:]:
+            doc, freq = docFreq.split(':')  #term:num_doc -> split(':') -> term, num_doc
+            wt = 1 + math.log10(int(freq))
+            doc_vectors[doc][token] = wt
+            
+        #get tokens doc freq
+        df_dict[token] = line[0].split(':')[1] # "line[0] -> term:num_docs  .split(':')[1] -> num_docs "
             
             
-    with open("doc_vector_length.txt", "r") as doc_db:
-        for doc in doc_vectors:
-            offset = seek_doc_index[doc]
-            doc_db.seek(offset)
-            line = doc_db.readline().rstrip().split(":") # docid:sumofSquare\n -> [docid, sumofSquare]
-            doc_sum_of_sq = line[1]
-            for token in doc_vectors[doc]: #doc_vectors[doc] = {token1:wt1, token2:wt2} 
-                doc_vectors[doc][token] = float(doc_vectors[doc][token])/float(doc_sum_of_sq) # wt1/sumofSquare
+    
+    for doc in doc_vectors:
+        offset = seek_doc_index[doc]
+        doc_db.seek(offset)
+        line = doc_db.readline().rstrip().split(":") # docid:sumofSquare\n -> [docid, sumofSquare]
+        doc_sum_of_sq = line[1]
+        for token in doc_vectors[doc]: #doc_vectors[doc] = {token1:wt1, token2:wt2} 
+            doc_vectors[doc][token] = float(doc_vectors[doc][token])/float(doc_sum_of_sq) # wt1/sumofSquare
 
     query_vector  = vector_query(tokens, df_dict)   #{token1:tf_idf_normalized, token2:tf_idf_normalized}
     
@@ -146,10 +147,12 @@ def main():
     create_seek_index()  
     with open("docidToUrl.json", 'r') as docidToUrl:
         docid_to_url = json.load(docidToUrl)
+    index = open("Index.txt", "r")
+    doc_db = open("doc_vector_length.txt", "r")
     user_query = input("enter query: ")
     start = datetime.now()
     while(user_query != "quit()"):
-        top_url_list = search(user_query)
+        top_url_list = search(user_query, index, doc_db)
         print(datetime.now() - start)
         i = 0
         show_more=True
@@ -167,5 +170,6 @@ def main():
                     show_more=False
         user_query = input("enter query: ")
         start = datetime.now()
-
+    index.close()
+    doc_db.close()
 main() 
