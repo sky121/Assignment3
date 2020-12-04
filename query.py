@@ -175,7 +175,7 @@ def main():
     doc_db = open("doc_vector_length.txt", "r")
     user_query = input("Enter Query: ")
     start = datetime.now()
-    while(user_query != "quit()"):
+    while(True):
         top_url_list = search(user_query, index, doc_db)
 
         #print(top_url_list[:5])
