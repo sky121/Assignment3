@@ -11,7 +11,7 @@ Indexer.py and Query.py are the two components of our search engine where Indexe
     
 ## QUICK START
     run the indexer first: Python3 Indexer.py 
-    after indexer completed running: Python3 query.py
+    after indexer completed running: Python3 Query.py
     
 ### Indexer.py
     To run the indexer, type the command: Python3 Indexer.py
@@ -23,11 +23,11 @@ Indexer.py and Query.py are the two components of our search engine where Indexe
             Token:NumOfDoc,Document ID: term frequency 
     docidToUrl.json is a json file that associates each DocId to Url
     cache.txt is a temporary text file that contains nothing(you may delete it once Indexer.py is finished running)
-    doc_vector_length.txt is a text file that associated each docId with the sum of square of the term frequencies used in query.py
+    doc_vector_length.txt is a text file that associated each docId with the sum of square of the term frequencies used in Query.py
   
   
-### query.py
-  To start the search engine run: Python3 query.py
+### Query.py
+  To start the search engine run: Python3 Query.py
   
   The console will then display "enter query: "
   Input your query and press Enter
