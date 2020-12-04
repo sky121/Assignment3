@@ -173,13 +173,13 @@ def main():
         docid_to_url = json.load(docidToUrl)
     index = open("Index.txt", "r")
     doc_db = open("doc_vector_length.txt", "r")
-    user_query = input("enter query: ")
+    user_query = input("Enter Query: ")
     start = datetime.now()
     while(user_query != "quit()"):
         top_url_list = search(user_query, index, doc_db)
 
         #print(top_url_list[:5])
-        print(datetime.now() - start)
+        print('Query Speed:',datetime.now() - start)
         i = 0
         show_more = True
         while show_more:
