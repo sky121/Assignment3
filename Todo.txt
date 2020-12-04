@@ -23,6 +23,11 @@ Imrpovements to be made:
 8. build index with word position. If two words from query appear close in a doc , we give the doc a higher weight. 
 9. Maybe we can add the authority ranking (I dont think its necessary since we only consider ics domain)
 
+ 
+Could possibly do:
+  1. Calculate the tf-wt in indexer instead of having just tf-raw (40ms diff for long query)
+
+
 doc_vector_length.txt
 docid1:sqrt_sum_of_square_tf
 docid2:sqrt_sum_of_square_tf

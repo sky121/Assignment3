@@ -2,6 +2,7 @@
 import sys
 import math
 import json
+import re
 from collections import defaultdict
 from datetime import datetime
 seek_index = dict()
@@ -30,6 +31,13 @@ def create_seek_index():
         curr_offset = 0
         for line in doc_db:
             N_corpus += 1  # MIGHT NEED TO SUBTRACT 1 FOR EXTRA LINE AT THE END OF DOC VECTOR LENGTH TXT
+            doc, sum_of_sq = line.split(':')
+            seek_doc_index[doc] = float(sum_of_sq)
+    '''
+    with open("doc_vector_length.txt", "r") as doc_db:
+        curr_offset = 0
+        for line in doc_db:
+            N_corpus += 1  # MIGHT NEED TO SUBTRACT 1 FOR EXTRA LINE AT THE END OF DOC VECTOR LENGTH TXT
             doc_entry = line.split(':')
             doc = doc_entry[0]
             seek_doc_index[doc] = curr_offset
@@ -37,22 +45,9 @@ def create_seek_index():
                 curr_offset += (len(line))
             else:
                 curr_offset += (len(line)) + 1
+    '''
     #print("Num Docs:", N_corpus)
 
-
-'''
-def merge_lists(list1, list2):
-    return_list = []
-    list1_dict = dict()
-    for docs1 in list1:
-        list1_dict[docs1.split(':')[0]] = docs1.split(':')[1]
-    for docs2 in list2:
-        if(docs2.split(':')[0] in list1_dict):
-            new_str = docs2.split(':')[
-                0] + ":" + str(int(list1_dict[docs2.split(':')[0]]) + int(docs2.split(':')[1]))
-            return_list.append(new_str)
-    return return_list
-'''
 
 
 # query vector: {token1:tf_idf, token2:tf_idf}  doc_vector: {token1:wt1, token3:wt2}
@@ -64,76 +59,78 @@ def cosine_similarity(query_vector, document_vector):
     return dot_product
 
 
-# open file and pass opened file as argument?
 def search(query, index, doc_db):  # we are using lnc.ltc (ddd.qqq)
-    tokens = query.split(' ')
-    # {doc1:{token1:wt1, token2:wt2}, doc2:{token1:wt1, token2:wt2}} used for keeping order for dot prodcut
-    doc_vectors = defaultdict(dict)
-
-    # used for query_vector only to get the df values in computing idf
-    df_dict = defaultdict(int)
-    for token in set(tokens):
+    tokens = [token.lower() for token in re.findall("[a-zA-Z0-9]+", query)] # removes everything except alpha numeric from query
+   
+    df_dict = defaultdict(int)  # used for query_vector only to get the df values in computing idf, gets the doc frequency for each token
+    line_cache = dict() # {token:line} caching the line from index.txt.
+    for token in set(tokens):# building tf-wt for doc_vector and df_dict for idf score in query vector 
         if token.lower() not in seek_index:
-            return []
+            continue
+
+        #if it a bad idf continue else we can seek
+
         offset = seek_index[token.lower()]
         index.seek(offset)
-        # [term:num_doc, doc_id:term_freq, doc_id2:term_freq, ...]
-        line = index.readline().rstrip().split(",")
+        line = index.readline().rstrip().split(",") # [term:num_doc, doc_id:term_freq, doc_id2:term_freq, ...]
+        line_cache[token] = line #caching the seek of line 
+        df_dict[token] = line[0].split(':')[1]  # "line[0] -> term:num_docs  .split(':')[1] -> num_docs "
+
+    query_vector = vector_query(tokens, df_dict) # {token1:tf_idf_normalized, token2:tf_idf_normalized}
+    
+    initial_doc_vectors = defaultdict(dict)  # {doc1:{token1:wt1, token2:wt2}, doc2:{token1:wt1, token2:wt2}} 
+    dict_of_doc_scores = defaultdict(int) # {doc_id:score}
+    
+    for token in query_vector: #query vector removed tokens with low idf scores and now we create out document vectors based on remaining tokens
+        line = line_cache[token] # no need to seek line because cached
         for docFreq in line[1:]:
-            # term:num_doc -> split(':') -> term, num_doc
-            doc, freq = docFreq.split(':')
-            wt = 1 + math.log10(int(freq))
-            doc_vectors[doc][token] = wt
 
-        # get tokens doc freq
-        # "line[0] -> term:num_docs  .split(':')[1] -> num_docs "
-        df_dict[token] = line[0].split(':')[1]
+            doc, tf_raw = docFreq.split(':')  # doc_id:tf -> split(':') -> doc_id, tf
+            
+            sum_of_sq = seek_doc_index[doc]
+            tf_wt = 1 + math.log10(int(tf_raw)) # building the doc vector 
+            dict_of_doc_scores[doc]+=tf_wt/sum_of_sq * query_vector[token]
+            initial_doc_vectors[doc][token] = tf_wt/sum_of_sq
 
+    doc_vectors = defaultdict(dict)  # {doc1:{token1:wt1, token2:wt2}, doc2:{token1:wt1, token2:wt2}} 
+    k_threshold = 50 #take a score and cut off at k_threshold documents so we dont have to take the cosine similarity of every single doc
+    count = 0
+    for doc, score in sorted(dict_of_doc_scores.items(), key = lambda x: x[1], reverse=True):
+        doc_vectors[doc] = initial_doc_vectors[doc]
+        count+=1
+        if count>=k_threshold:
+            break
+
+
+
+    if len(df_dict) == 0: #all tokens in query were not in the seek_index so return empty seach result
+        return []
+
+    '''
     for doc in doc_vectors:
         offset = seek_doc_index[doc]
         doc_db.seek(offset)
-        # docid:sumofSquare\n -> [docid, sumofSquare]
-        line = doc_db.readline().rstrip().split(":")
+        line = doc_db.readline().rstrip().split(":")# docid:sumofSquare\n -> [docid, sumofSquare]
         doc_sum_of_sq = line[1]
-        # doc_vectors[doc] = {token1:wt1, token2:wt2}
-        for token in doc_vectors[doc]:
+        for token in doc_vectors[doc]: # doc_vectors[doc] = {token1:wt1, token2:wt2}
             doc_vectors[doc][token] = float(
                 doc_vectors[doc][token])/float(doc_sum_of_sq)  # wt1/sumofSquare
+    '''
+    
 
-    # {token1:tf_idf_normalized, token2:tf_idf_normalized}
-    query_vector = vector_query(tokens, df_dict)
     return_list = []
-    for docs, doc_vector in doc_vectors.items():
+    for docs, doc_vector in doc_vectors.items(): #OPTIMIZE WITH THRESHOLD K
         sim = cosine_similarity(query_vector, doc_vector)
-        # [doc_id1:similarity, doc_id2:similarity]
-        return_list.append(f"{docs}:{sim}")
-
-    # sorts by similarity by splitting doc_id1:similarity -> similarity
-    return_list.sort(key=lambda x: float(x.split(':')[1]), reverse=True)
+        return_list.append(f"{docs}:{sim}") # [doc_id1:similarity, doc_id2:similarity]
+    return_list.sort(key=lambda x: float(x.split(':')[1]), reverse=True) # sorts by similarity by splitting doc_id1:similarity -> similarity
     return return_list
 
-    '''
-    line_list.sort(key=lambda x: x[0].split(':')[1])
-    if(len(line_list) == 1):
-        current_line = line_list[0][1:]
-        current_line.sort(key=lambda x: int(x.split(':')[1]), reverse=True)
-        return current_line[:5]
-
-    indx = 2
-    current_line = merge_lists(line_list[0][1:], line_list[1][1:])
-    while indx < len(tokens):
-        current_line = merge_lists(current_line, line_list[indx][1:])
-        indx += 1
-    current_line.sort(key=lambda x: int(x.split(':')[1]), reverse=True)
-    return current_line
-    '''
 
 
 def vector_query(tokens, df_dict):
     global N_corpus
     '''returns the normalized query vector'''
-    token_vector = defaultdict(
-        int)  # {token1: normalized tf.idf, token2: normalized tf.idf}
+    token_vector = defaultdict(int)  # {token1: normalized tf.idf, token2: normalized tf.idf}
 
     for token in tokens:
         token_vector[token] += 1
@@ -142,18 +139,39 @@ def vector_query(tokens, df_dict):
             continue
         token_vector[token] = 1 + math.log10(frequency)
     sum_of_sq = 0
+    total_idf = 0
+    idf_vector = list()
     for token, df in df_dict.items():
         idf = math.log10(N_corpus/float(df))
-        # Calculate the weight vector which is tf * idf
-        token_vector[token] = token_vector[token]*idf
-        # gets the sum of squares for normalization of vector
-        sum_of_sq += token_vector[token]**2
+        total_idf+=idf
+        idf_vector.append((token, idf))
+        token_vector[token] = token_vector[token]*idf  # Calculate the weight vector which is tf * idf
+        sum_of_sq += token_vector[token]**2 # gets the sum of squares for normalization of vector
 
-    # calculating the normalized vector for cosine.
-    for token, tf_idf in token_vector.items():
-        token_vector[token] = tf_idf/math.sqrt(sum_of_sq)
+    final_token_vector = dict()
+    idf_sum = 0
 
-    return token_vector
+    threshold_percentage = 0.9 
+    for token, idf in sorted(idf_vector, key=lambda x: x[1], reverse = True): #heuristic to remove tokens with low idf scores
+        idf_sum+=idf
+        percentage = idf_sum/total_idf
+        final_token_vector[token] = token_vector[token]
+        if percentage>threshold_percentage:
+            break
+    
+
+    # token:idf token:idf token:idf token:idf
+    # sort based on idf
+    # total = idf+idf+idf
+    
+    # percentage iterating sum/total -> until if percentage>threshold or len(vector)>32: stop
+    
+
+    
+    for token, tf_idf in final_token_vector.items(): # calculating the normalized vector for cosine.
+        final_token_vector[token] = tf_idf/math.sqrt(sum_of_sq)
+
+    return final_token_vector
 
 
 def main():
