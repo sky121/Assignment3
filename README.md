@@ -11,7 +11,8 @@ Indexer.py and Query.py are the two components of our search engine where Indexe
     
 ## QUICK START
     run the indexer first: Python3 Indexer.py 
-
+    after indexer completed running: Python3 query.py
+    
 ### Indexer.py
     To run the indexer, type the command: Python3 Indexer.py
     The Indexer.py will create 4 documents in the disk: index.txt, docidToUrl.json, cache.txt, and doc_vector_length.txt
@@ -21,7 +22,7 @@ Indexer.py and Query.py are the two components of our search engine where Indexe
     index.txt is the inverted index corpus that we built. The format of the index.txt is as follow:
             Token:NumOfDoc,Document ID: term frequency 
     docidToUrl.json is a json file that associates each DocId to Url
-    cache.txt is a temprry text file that contains nothing(you may delete it)
+    cache.txt is a temporary text file that contains nothing(you may delete it once Indexer.py is finished running)
     doc_vector_length.txt is a text file that associated each docId with the sum of square of the term frequencies used in query.py
   
   

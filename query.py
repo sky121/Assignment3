@@ -159,13 +159,6 @@ def vector_query(tokens, df_dict):
             break
     
 
-    # token:idf token:idf token:idf token:idf
-    # sort based on idf
-    # total = idf+idf+idf
-    
-    # percentage iterating sum/total -> until if percentage>threshold or len(vector)>32: stop
-    
-
     
     for token, tf_idf in final_token_vector.items(): # calculating the normalized vector for cosine.
         final_token_vector[token] = tf_idf/math.sqrt(sum_of_sq)
