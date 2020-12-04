@@ -102,7 +102,6 @@ def search(query, index, doc_db):  # we are using lnc.ltc (ddd.qqq)
             break
 
 
-
     if len(df_dict) == 0: #all tokens in query were not in the seek_index so return empty seach result
         return []
 
@@ -186,7 +185,7 @@ def main():
     while(user_query != "quit()"):
         top_url_list = search(user_query, index, doc_db)
 
-        print(top_url_list[:5])
+        #print(top_url_list[:5])
         print(datetime.now() - start)
         i = 0
         show_more = True
