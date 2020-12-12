@@ -5,6 +5,75 @@ import re
 from collections import defaultdict
 import json
 from math import sqrt
+from nltk.stem import PorterStemmer
+from hashlib import sha224 
+
+fingerprint_list = set()
+
+def computeWordFrequencies(token_list):
+    local_pages_word_frequencies = dict()
+    for token in token_list:
+        if token in local_pages_word_frequencies:
+            local_pages_word_frequencies[token] += 1
+        else:
+            local_pages_word_frequencies[token] = 1
+    return local_pages_word_frequencies
+
+
+
+
+def simhash(word_frequency_dict):
+    '''takes in the word frequency dict and output a binary vector for the ID of the website'''
+    bin_length = 256
+    total_vector = [0] * bin_length
+    for word in word_frequency_dict.keys():
+        one_vector = list()
+        hash_val = bin(
+            int(sha224(word.encode("utf-8")).hexdigest(), 16))[2:(bin_length+2)]
+        hash_len = len(hash_val)
+
+        if (hash_len < bin_length):
+            difference = bin_length - hash_len
+            hash_val = ("0" * difference) + hash_val
+        for binary in hash_val:
+            if binary == "0":
+                one_vector.append(-1*word_frequency_dict[word])
+            else:
+                one_vector.append(word_frequency_dict[word])
+
+        for indx in range(len(total_vector)):
+            total_vector[indx] += one_vector[indx]
+    binary_str = ""
+    for i in total_vector:
+        if i > 0:
+            binary_str += "1"
+        else:
+            binary_str += "0"
+
+    return binary_str
+
+def check_duplicate_page(word_frequency_dict):
+    global fingerprint_list
+    fingerprint = simhash(word_frequency_dict)
+    threshold = 0.9
+    for each_website in fingerprint_list:
+        total = 0
+        xorval = bin(int(fingerprint, 2) ^ int(each_website, 2))[2:]
+        if (len(xorval) < len(fingerprint)):
+            difference = len(fingerprint)-len(xorval)
+            xorval = ("0" * difference) + xorval
+        for i in xorval:
+            # we are forced to use xor but not xnor in this case
+            # counting 0 means two digits are the same in xor
+            if i == "0":
+                total += 1
+        similarity = float(total)/len(fingerprint)
+        if similarity > threshold:
+            fingerprint_list.add(fingerprint)
+            return True
+    fingerprint_list.add(fingerprint)
+    return False
+
 
 
 def store_doc_vector_length(doc_id, tokens):
@@ -23,6 +92,8 @@ def store_doc_vector_length(doc_id, tokens):
 
 def get_tokens_in_page(content):
     # gets the list of tokens in the website content
+    ps = PorterStemmer()
+
     soup = BeautifulSoup(content, "html.parser")
     scripts = soup.find_all('script')
     for _ in scripts:
@@ -31,8 +102,25 @@ def get_tokens_in_page(content):
     for _ in styles:
         soup.style.extract()
     tokens_found = soup.get_text()
-    tokens = [token.lower()
-              for token in re.findall("[a-zA-Z0-9]+", tokens_found)]
+
+    tagWords = list()
+    semiImportantTags =  soup.find_all(["h1", "h2", "h3", "strong","b"])
+    title = soup.find_all('title')
+    for tag in semiImportantTags:
+        tagWords.append(tag.get_text().replace('\n', '').replace('\xa0', ''))
+    for tag in title:
+        t = tag.get_text().replace('\n', '').replace('\xa0', '')
+        print(t)
+        tagWords.append(t)
+        tagWords.append(t)
+    #print("tagwords", tagWords)
+    #print(tokens_found)
+    
+    tokens = [ps.stem(token.lower()) for token in re.findall("[a-zA-Z0-9]+", tokens_found)]
+
+    for words in tagWords:
+        for token in re.findall("[a-zA-Z0-9]+", words):
+            tokens.append(ps.stem(token.lower()))
     return tokens
 
 
@@ -135,13 +223,17 @@ def main():
     threshold_count = 0
     for (dirpath, _, filenames) in walk('./DEV'):
         for file_name in filenames:  # looping through files in the directory DEV
-            threshold_count += 1
-            num_docs += 1
             in_file = open(f"{dirpath}/{file_name}", "r")
             # load the json of each file which contains {url, content, encoding}
             website = json.load(in_file)
             # tokens are the list of words in the website loaded
             tokens = get_tokens_in_page(website["content"])
+            word_frequency_dict = computeWordFrequencies(tokens) # built to check duplicate pages 
+            if (check_duplicate_page(word_frequency_dict)):
+                continue
+                
+            threshold_count += 1
+            num_docs += 1
             website_id += 1  # get_hash(website['url'])
             store_doc_vector_length(website_id, tokens)
             docid_to_url[website_id] = website['url']
