@@ -22,57 +22,57 @@ def computeWordFrequencies(token_list):
 
 
 
-def simhash(word_frequency_dict):
-    '''takes in the word frequency dict and output a binary vector for the ID of the website'''
-    bin_length = 256
-    total_vector = [0] * bin_length
-    for word in word_frequency_dict.keys():
-        one_vector = list()
-        hash_val = bin(
-            int(sha224(word.encode("utf-8")).hexdigest(), 16))[2:(bin_length+2)]
-        hash_len = len(hash_val)
+# def simhash(word_frequency_dict):
+#     '''takes in the word frequency dict and output a binary vector for the ID of the website'''
+#     bin_length = 256
+#     total_vector = [0] * bin_length
+#     for word in word_frequency_dict.keys():
+#         one_vector = list()
+#         hash_val = bin(
+#             int(sha224(word.encode("utf-8")).hexdigest(), 16))[2:(bin_length+2)]
+#         hash_len = len(hash_val)
 
-        if (hash_len < bin_length):
-            difference = bin_length - hash_len
-            hash_val = ("0" * difference) + hash_val
-        for binary in hash_val:
-            if binary == "0":
-                one_vector.append(-1*word_frequency_dict[word])
-            else:
-                one_vector.append(word_frequency_dict[word])
+#         if (hash_len < bin_length):
+#             difference = bin_length - hash_len
+#             hash_val = ("0" * difference) + hash_val
+#         for binary in hash_val:
+#             if binary == "0":
+#                 one_vector.append(-1*word_frequency_dict[word])
+#             else:
+#                 one_vector.append(word_frequency_dict[word])
 
-        for indx in range(len(total_vector)):
-            total_vector[indx] += one_vector[indx]
-    binary_str = ""
-    for i in total_vector:
-        if i > 0:
-            binary_str += "1"
-        else:
-            binary_str += "0"
+#         for indx in range(len(total_vector)):
+#             total_vector[indx] += one_vector[indx]
+#     binary_str = ""
+#     for i in total_vector:
+#         if i > 0:
+#             binary_str += "1"
+#         else:
+#             binary_str += "0"
 
-    return binary_str
+#     return binary_str
 
-def check_duplicate_page(word_frequency_dict):
-    global fingerprint_list
-    fingerprint = simhash(word_frequency_dict)
-    threshold = 0.9
-    for each_website in fingerprint_list:
-        total = 0
-        xorval = bin(int(fingerprint, 2) ^ int(each_website, 2))[2:]
-        if (len(xorval) < len(fingerprint)):
-            difference = len(fingerprint)-len(xorval)
-            xorval = ("0" * difference) + xorval
-        for i in xorval:
-            # we are forced to use xor but not xnor in this case
-            # counting 0 means two digits are the same in xor
-            if i == "0":
-                total += 1
-        similarity = float(total)/len(fingerprint)
-        if similarity > threshold:
-            fingerprint_list.add(fingerprint)
-            return True
-    fingerprint_list.add(fingerprint)
-    return False
+# def check_duplicate_page(word_frequency_dict):
+#     global fingerprint_list
+#     fingerprint = simhash(word_frequency_dict)
+#     threshold = 0.9
+#     for each_website in fingerprint_list:
+#         total = 0
+#         xorval = bin(int(fingerprint, 2) ^ int(each_website, 2))[2:]
+#         if (len(xorval) < len(fingerprint)):
+#             difference = len(fingerprint)-len(xorval)
+#             xorval = ("0" * difference) + xorval
+#         for i in xorval:
+#             # we are forced to use xor but not xnor in this case
+#             # counting 0 means two digits are the same in xor
+#             if i == "0":
+#                 total += 1
+#         similarity = float(total)/len(fingerprint)
+#         if similarity > threshold:
+#             fingerprint_list.add(fingerprint)
+#             return True
+#     fingerprint_list.add(fingerprint)
+#     return False
 
 
 
@@ -110,7 +110,6 @@ def get_tokens_in_page(content):
         tagWords.append(tag.get_text().replace('\n', '').replace('\xa0', ''))
     for tag in title:
         t = tag.get_text().replace('\n', '').replace('\xa0', '')
-        print(t)
         tagWords.append(t)
         tagWords.append(t)
     #print("tagwords", tagWords)
@@ -229,8 +228,8 @@ def main():
             # tokens are the list of words in the website loaded
             tokens = get_tokens_in_page(website["content"])
             word_frequency_dict = computeWordFrequencies(tokens) # built to check duplicate pages 
-            if (check_duplicate_page(word_frequency_dict)):
-                continue
+            #if (check_duplicate_page(word_frequency_dict)):
+            #    continue
                 
             threshold_count += 1
             num_docs += 1

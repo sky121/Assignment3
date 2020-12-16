@@ -5,6 +5,8 @@ import json
 import re
 from collections import defaultdict
 from datetime import datetime
+from nltk.stem import PorterStemmer
+
 seek_index = dict()
 docid_to_url = dict()
 seek_doc_index = dict()
@@ -60,7 +62,8 @@ def cosine_similarity(query_vector, document_vector):
 
 
 def search(query, index, doc_db):  # we are using lnc.ltc (ddd.qqq)
-    tokens = [token.lower() for token in re.findall("[a-zA-Z0-9]+", query)] # removes everything except alpha numeric from query
+    ps = PorterStemmer()
+    tokens = [ps.stem(token.lower()) for token in re.findall("[a-zA-Z0-9]+", query)] # removes everything except alpha numeric from query
    
     df_dict = defaultdict(int)  # used for query_vector only to get the df values in computing idf, gets the doc frequency for each token
     line_cache = dict() # {token:line} caching the line from index.txt.
@@ -178,7 +181,7 @@ def main():
     while(True):
         top_url_list = search(user_query, index, doc_db)
 
-        #print(top_url_list[:5])
+        print(top_url_list[:5])
         print('Query Speed:',datetime.now() - start)
         i = 0
         show_more = True
