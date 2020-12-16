@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lange="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+</head>
+<body >
+    <div >
+        <h1>Search UCI </h1>
+        <form method="POST">
+            <br>
+            <input name ="search" style="width: 400px; border-radius: 8px;">
+            <input type="submit" style="border-radius: 8px;"><span style="margin-left: 20px;">{{time}}</span>
+            <br>
+            <br>
+            {% for url in urls %}
+                <a href="{{url}}">{{url}}</a>
+                <br>
+            {% endfor %}
+        </form>
+        <br>
+
+    </div>
+   
+</body>
+</html>

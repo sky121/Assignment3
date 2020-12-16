@@ -110,7 +110,6 @@ def get_tokens_in_page(content):
         tagWords.append(tag.get_text().replace('\n', '').replace('\xa0', ''))
     for tag in title:
         t = tag.get_text().replace('\n', '').replace('\xa0', '')
-        print(t)
         tagWords.append(t)
         tagWords.append(t)
     #print("tagwords", tagWords)
