@@ -3,6 +3,8 @@ import sys
 import math
 import json
 import re
+import webbrowser
+from flask import Flask ,request, render_template
 from collections import defaultdict
 from datetime import datetime
 from nltk.stem import PorterStemmer
@@ -169,38 +171,35 @@ def vector_query(tokens, df_dict):
     return final_token_vector
 
 
+app = Flask(__name__)
+@app.route('/')
 def main():
-    global docid_to_url
+    global docid_to_url, index, doc_db
     create_seek_index()
     with open("docidToUrl.json", 'r') as docidToUrl:
         docid_to_url = json.load(docidToUrl)
     index = open("Index.txt", "r")
     doc_db = open("doc_vector_length.txt", "r")
-    user_query = input("Enter Query: ")
+    return render_template('index.html')
+     
+
+@app.route('/', methods=['POST'])
+def what():
+    user_query = request.form['search']
     start = datetime.now()
-    while(True):
-        top_url_list = search(user_query, index, doc_db)
 
-        print(top_url_list[:5])
-        print('Query Speed:',datetime.now() - start)
-        i = 0
-        show_more = True
-        while show_more:
-            if(i >= len(top_url_list)):
-                break
-            docid = top_url_list[i]
-
-            print(docid_to_url[docid.split(':')[0]])
-            # print(docid.split(':')[1])
-            i += 1
-            if(i % 10 == 0):
-                show = input("Show More? (yes/no) ")
-                if(show == 'no'):
-                    show_more = False
-        user_query = input("enter query: ")
-        start = datetime.now()
-    index.close()
-    doc_db.close()
+    
+    top_url_list = search(user_query, index, doc_db)
 
 
-main()
+    return render_template('index.html', urls = what , time = datetime.now() - start)
+
+if __name__ == '__main__':
+    webbrowser.open("http://localhost:5000/") 
+    app.run()
+    
+
+index.close()
+doc_db.close()
+
+
