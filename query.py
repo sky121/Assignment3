@@ -188,11 +188,13 @@ def what():
     user_query = request.form['search']
     start = datetime.now()
 
-    
     top_url_list = search(user_query, index, doc_db)
+    fixed_list = []
+    for link in top_url_list:
+        docid = link.split(":")[0]
+        fixed_list.append(docid_to_url[docid])
 
-
-    return render_template('index.html', urls = what , time = datetime.now() - start)
+    return render_template('index.html', urls = fixed_list , time = datetime.now() - start)
 
 if __name__ == '__main__':
     webbrowser.open("http://localhost:5000/") 
